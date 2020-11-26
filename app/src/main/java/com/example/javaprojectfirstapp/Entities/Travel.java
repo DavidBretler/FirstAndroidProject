@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -23,13 +24,28 @@ public class Travel {
     private String clientName;
     private String clientPhone;
     private String clientEmail;
+    private int    numOfPassenger;
 
 
-    @TypeConverters(UserLocationConverter.class)
-    private UserLocation travelLocation;
+
+    public String getId(){
+        return this.travelId;
+    }
+    public String getClientName() {return this.clientName; }
+    public String getClientPhone() {return this.clientPhone; }
+    public String getClientEmail() {return this.clientEmail; }
+    public Integer getNumPassengers() { return this.numOfPassenger; }
+    public Integer getRequestType() { return RequestType.getTypeInt(this.requesType);}
+    public String getTravelDate() { return new DateConverter().dateToTimestamp(this.travelDate);}
+    public String getArrivalDate() { return new DateConverter().dateToTimestamp(this.arrivalDate);}
+    public String getCompany() { return new CompanyConverter().asString(this.company);}
+
+
+    //@TypeConverters(UserLocationConverter.class)
+  //  private UserLocation travelLocation;
 
     @TypeConverters(RequestType.class)
-    private RequestType requesType;
+    private RequestType requesType=RequestType.sent;
 
     @TypeConverters(DateConverter.class)
     private Date travelDate;
@@ -40,13 +56,20 @@ public class Travel {
 
     private HashMap<String, Boolean> company;
 
-
-
-    public Travel() {
+    public Travel(String clientName, String clientPhone, String clientEmail, Date departingDate, Date returnDate,int numOfPassenger) {
+        this.clientName = clientName;
+        this.clientPhone = clientPhone;
+        this.clientEmail = clientEmail;
+        this.travelDate = departingDate;
+        this.arrivalDate = returnDate;
+        this.numOfPassenger=numOfPassenger;
+        // TODO: 22/11/2020 get addresses of costumer in userlocatin 
     }
 
+
+
     public void setTravelId(String id) {
-        // TODO: 13/11/2020 implment 
+        this.travelId=id;
     }
 
 

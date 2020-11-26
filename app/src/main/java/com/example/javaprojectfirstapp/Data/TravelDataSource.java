@@ -1,6 +1,9 @@
 package com.example.javaprojectfirstapp.Data;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.javaprojectfirstapp.Entities.Travel;
@@ -9,13 +12,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Date;
 import java.util.List;
 
 public class TravelDataSource {
 
 
     private MutableLiveData<Boolean> isSuccess= new MutableLiveData<>();
-    public MutableLiveData<Boolean> getIsSuccess() {
+    public LiveData<Boolean> getIsSuccess() {
         return isSuccess;
     }
 
@@ -39,8 +43,7 @@ public class TravelDataSource {
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference travels = firebaseDatabase.getReference("ExistingTravels");
 
-    private TravelDataSource() {
-
+    public TravelDataSource() {
     }
 
     private static TravelDataSource instance;
@@ -51,15 +54,14 @@ public class TravelDataSource {
         return instance;
     }
 
-
     public void addTravel(Travel p) {
         String id = travels.push().getKey();
-        p.setTravelId(id);
+        p.setTravelId(id); //
         travels.child(id).setValue(p).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 isSuccess.setValue(true);
-                isSuccess.setValue(null);
+             //   isSuccess.setValue(null);
             }
 
 
@@ -67,7 +69,7 @@ public class TravelDataSource {
             @Override
             public void onFailure(@NonNull Exception e) {
                 isSuccess.setValue(false);
-                isSuccess.setValue(null);
+     //           isSuccess.setValue(null);
             }
         });
     }
