@@ -61,7 +61,6 @@ public class TravelDataSource {
             @Override
             public void onSuccess(Void aVoid) {
                 isSuccess.setValue(true);
-             //   isSuccess.setValue(null);
             }
 
 
@@ -69,7 +68,6 @@ public class TravelDataSource {
             @Override
             public void onFailure(@NonNull Exception e) {
                 isSuccess.setValue(false);
-     //           isSuccess.setValue(null);
             }
         });
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.DatePickerDialog;
+import android.location.Location;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 //import com.example.javaprojectfirstapp.Data.TravelDataSource;
 import com.example.javaprojectfirstapp.Entities.Travel;
+import com.example.javaprojectfirstapp.Entities.UserLocation;
 import com.example.javaprojectfirstapp.R;
 
 import java.text.ParseException;
@@ -30,7 +32,7 @@ public class AddTravelActivity extends AppCompatActivity {
     final Integer NUM_OF_FILDES = 8;
     private Travel travel;
     private List<EditText> fieldsArr = new ArrayList<EditText>(NUM_OF_FILDES);
-
+    UserLocation userLocation ;
     DatePickerDialog picker;
     EditText eText;
     EditText eText2;
@@ -68,7 +70,7 @@ public class AddTravelActivity extends AppCompatActivity {
         eText.setInputType(InputType.TYPE_NULL);
         eText2 = (EditText) fieldsArr.get(7);
         eText2.setInputType(InputType.TYPE_NULL);
-
+        String a = ((EditText)findViewById(R.id.Txt_pickupAddress)).getText().toString();
     }
 
     /**
@@ -103,7 +105,7 @@ public class AddTravelActivity extends AppCompatActivity {
     }
 
     public void success() {
-        Toast.makeText(this, "success !!! ", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Travel saved successfully  ", Toast.LENGTH_LONG).show();
     }
 
     // LinearLayout ll = (LinearLayout) findViewById(R.id.linearLayout2);
@@ -116,13 +118,27 @@ public class AddTravelActivity extends AppCompatActivity {
     public void saveTravelRequest(View view) throws ParseException {
 
     //   if (confirmInput(view)) {
-            Date departingDate=new Travel.DateConverter().fromTimestamp(fieldsArr.get(6).getText().toString());
-            Date returnDate=new Travel.DateConverter().fromTimestamp(fieldsArr.get(7).getText().toString());
-           // int NumPassengers=Integer.parseInt("hello123".replaceAll("[\\D]",""));
-           // int NumPassengers=Integer.parseInt("8");
-//            travel = new Travel(fieldsArr.get(3).getText().toString().trim(), fieldsArr.get(1).getText().toString().trim()
-//                    , fieldsArr.get(0).getText().toString().trim(),departingDate,returnDate, NumPassengers);
-//            addTravel(travel);
+            Date departingDate=new Travel.DateConverter().fromTimestamp(fieldsArr.get(6).getText().toString().trim());
+            Date returnDate=new Travel.DateConverter().fromTimestamp(fieldsArr.get(7).getText().toString().trim());
+            int NumPassengers=Integer.parseInt(fieldsArr.get(2).getText().toString().trim());
+
+            userLocation=new UserLocation();
+
+ //           Travel.UserLocationConverter locatin=new Travel.UserLocationConverter();
+//            locatin.LocationFromString(fieldsArr.get(4).getText().toString().trim());
+//            UserLocation pickupAddress= userLocation.convertFromLocation(locatin.travelLocation);
+//
+//            locatin.LocationFromString(fieldsArr.get(5).getText().toString().trim());
+//            UserLocation destAddress= userLocation.convertFromLocation(locatin.travelLocation);
+
+            UserLocation pickupAddress =userLocation.convertFromLocation(
+                    new Travel.UserLocationConverter().LocationFromString(fieldsArr.get(4).getText().toString().trim()));
+        //    UserLocation destAddress =new Travel.UserLocationConverter().fromString(fieldsArr.get(5).getText().toString().trim());
+       // UserLocation pickupAddress =new UserLocation();
+        UserLocation destAddress =new UserLocation();
+            travel = new Travel(fieldsArr.get(3).getText().toString().trim(), fieldsArr.get(1).getText().toString().trim()
+                    , fieldsArr.get(0).getText().toString().trim(),departingDate,returnDate, NumPassengers,pickupAddress,destAddress);
+            addTravel(travel);
             Toast.makeText(this, "detail sent down", Toast.LENGTH_LONG).show();
    //     }
     }

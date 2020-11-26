@@ -5,6 +5,8 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
+
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,7 +14,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Application;
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.AsyncTask;
+import android.widget.Toast;
 
+import com.example.javaprojectfirstapp.UI.AddTravel.AddTravelActivity;
 
 
 @Entity
@@ -25,7 +37,7 @@ public class Travel {
     private String clientPhone;
     private String clientEmail;
     private int    numOfPassenger;
-
+     private  Geocoder geocoder;
 
 
     public String getId(){
@@ -40,9 +52,10 @@ public class Travel {
     public String getArrivalDate() { return new DateConverter().dateToTimestamp(this.arrivalDate);}
     public String getCompany() { return new CompanyConverter().asString(this.company);}
 
+    @TypeConverters(UserLocationConverter.class)
+    private UserLocation pickupAddress;
+    private UserLocation destAddress;
 
-    //@TypeConverters(UserLocationConverter.class)
-  //  private UserLocation travelLocation;
 
     @TypeConverters(RequestType.class)
     private RequestType requesType=RequestType.sent;
@@ -56,16 +69,28 @@ public class Travel {
 
     private HashMap<String, Boolean> company;
 
-    public Travel(String clientName, String clientPhone, String clientEmail, Date departingDate, Date returnDate,int numOfPassenger) {
+    public Travel(String clientName, String clientPhone, String clientEmail, Date departingDate, Date returnDate
+            ,int numOfPassenger,UserLocation pickupAddress ,UserLocation destAddress) {
         this.clientName = clientName;
         this.clientPhone = clientPhone;
         this.clientEmail = clientEmail;
         this.travelDate = departingDate;
         this.arrivalDate = returnDate;
         this.numOfPassenger=numOfPassenger;
+        this.pickupAddress=pickupAddress;
+        this.destAddress=destAddress;
         // TODO: 22/11/2020 get addresses of costumer in userlocatin 
     }
-
+    public Travel(String clientName, String clientPhone, String clientEmail, Date departingDate, Date returnDate
+            ,int numOfPassenger) {
+        this.clientName = clientName;
+        this.clientPhone = clientPhone;
+        this.clientEmail = clientEmail;
+        this.travelDate = departingDate;
+        this.arrivalDate = returnDate;
+        this.numOfPassenger=numOfPassenger;
+        // TODO: 22/11/2020 get addresses of costumer in userlocatin
+    }
 
 
     public void setTravelId(String id) {
@@ -145,9 +170,36 @@ public class Travel {
         }
     }
 
-   public static class UserLocationConverter {
-       }
-       /*   @TypeConverter
+   public static class UserLocationConverter extends Application {
+       public Location travelLocation;
+
+
+
+               Geocoder geocoder=new Geocoder(this);
+       @TypeConverter
+       public Location LocationFromString(String value)  {
+
+           try {
+               List<Address> l = geocoder.getFromLocationName(value, 1);
+               if (!l.isEmpty()) {
+                   Address temp = l.get(0);
+                   travelLocation = new Location("travelLocation");
+                   travelLocation.setLatitude(temp.getLatitude());
+                   travelLocation.setLongitude(temp.getLongitude());
+                   return  travelLocation;
+               } else {
+                   Toast.makeText(this, "4:Unable to understand address", Toast.LENGTH_LONG).show();
+               }
+           }
+           catch (IOException e) {
+
+               Toast.makeText(this, "5:Unable to understand address. Check Internet connection.", Toast.LENGTH_LONG).show();
+
+           }
+           return  travelLocation;
+           }
+
+    @TypeConverter
         public UserLocation fromString(String value) {
             if (value == null || value.equals(""))
                 return null;
@@ -160,6 +212,6 @@ public class Travel {
         public String asString(UserLocation warehouseUserLocation) {
             return warehouseUserLocation == null ? "" : warehouseUserLocation.getLat() + " " + warehouseUserLocation.getLon();
         }
-    }*/
-}
+    }
 
+}
