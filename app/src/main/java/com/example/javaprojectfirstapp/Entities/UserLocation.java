@@ -21,6 +21,14 @@ public class UserLocation {
         this.lon = lon;
     }
 
+    @Override
+    public String toString() {
+        return "UserLocation{" +
+                "lat=" + lat +
+                ", lon=" + lon +
+                '}';
+    }
+
     public UserLocation() {
     }
 

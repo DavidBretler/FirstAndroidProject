@@ -4,22 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/carpic"
     tools:context=".UI.Mainactivity.MainActivity">
 
     <Button
         android:id="@+id/BTN_GoToAddTravel"
-        android:layout_width="202dp"
-        android:layout_height="50dp"
+        android:layout_width="240dp"
+        android:layout_height="69dp"
         android:layout_marginStart="50dp"
         android:layout_marginLeft="50dp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="124dp"
         android:layout_marginEnd="50dp"
         android:layout_marginRight="50dp"
+        android:onClick="go_to_add_travel_func"
         android:text="Add new tarvel"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:onClick="go_to_add_travel_func"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

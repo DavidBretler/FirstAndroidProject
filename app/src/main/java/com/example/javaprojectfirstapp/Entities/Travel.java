@@ -6,29 +6,24 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import android.app.Application;
-import android.content.Context;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.widget.Toast;
-
-import com.example.javaprojectfirstapp.UI.AddTravel.AddTravelActivity;
 
 
 @Entity
 public class Travel {
+
+    public  final Integer MAX_NUM_OF_ADDRESS = 5;
+
 
     @NonNull
     @PrimaryKey
@@ -37,8 +32,20 @@ public class Travel {
     private String clientPhone;
     private String clientEmail;
     private int    numOfPassenger;
-     private  Geocoder geocoder;
+    @TypeConverters(UserLocationConverter.class)
+    private UserLocation pickupAddress;
 
+    private   List<UserLocation> destAddressList = new ArrayList<UserLocation>(MAX_NUM_OF_ADDRESS);
+    @TypeConverters(RequestType.class)
+    private RequestType requesType=RequestType.sent;
+
+    @TypeConverters(DateConverter.class)
+    private Date travelDate;
+
+    @TypeConverters(DateConverter.class)
+    private Date arrivalDate;
+
+    private HashMap<String, Boolean> company;
 
     public String getId(){
         return this.travelId;
@@ -51,26 +58,11 @@ public class Travel {
     public String getTravelDate() { return new DateConverter().dateToTimestamp(this.travelDate);}
     public String getArrivalDate() { return new DateConverter().dateToTimestamp(this.arrivalDate);}
     public String getCompany() { return new CompanyConverter().asString(this.company);}
-
-    @TypeConverters(UserLocationConverter.class)
-    private UserLocation pickupAddress;
-    private UserLocation destAddress;
-
-
-    @TypeConverters(RequestType.class)
-    private RequestType requesType=RequestType.sent;
-
-    @TypeConverters(DateConverter.class)
-    private Date travelDate;
-
-    @TypeConverters(DateConverter.class)
-    private Date arrivalDate;
-
-
-    private HashMap<String, Boolean> company;
+    public String getPickupAddress() { return this.pickupAddress.toString(); }
+    public String getDestAddressList() { return this.destAddressList.toString(); }
 
     public Travel(String clientName, String clientPhone, String clientEmail, Date departingDate, Date returnDate
-            ,int numOfPassenger,UserLocation pickupAddress ,UserLocation destAddress) {
+            ,int numOfPassenger,UserLocation  pickupAddress , List<UserLocation> destAddress) {
         this.clientName = clientName;
         this.clientPhone = clientPhone;
         this.clientEmail = clientEmail;
@@ -78,19 +70,10 @@ public class Travel {
         this.arrivalDate = returnDate;
         this.numOfPassenger=numOfPassenger;
         this.pickupAddress=pickupAddress;
-        this.destAddress=destAddress;
-        // TODO: 22/11/2020 get addresses of costumer in userlocatin 
+        this.destAddressList =destAddress;
+
     }
-    public Travel(String clientName, String clientPhone, String clientEmail, Date departingDate, Date returnDate
-            ,int numOfPassenger) {
-        this.clientName = clientName;
-        this.clientPhone = clientPhone;
-        this.clientEmail = clientEmail;
-        this.travelDate = departingDate;
-        this.arrivalDate = returnDate;
-        this.numOfPassenger=numOfPassenger;
-        // TODO: 22/11/2020 get addresses of costumer in userlocatin
-    }
+
 
 
     public void setTravelId(String id) {
@@ -174,13 +157,18 @@ public class Travel {
        public Location travelLocation;
 
 
+            //  Location location=
+              Geocoder geocoder=new Geocoder(getBaseContext());
 
-               Geocoder geocoder=new Geocoder(this);
-       @TypeConverter
+           //Context context = ApplicationProvider.getApplicationContext();
+      //    Geocoder  geocoder = new Geocoder(context);
+
+     /*  @TypeConverter
        public Location LocationFromString(String value)  {
 
            try {
-               List<Address> l = geocoder.getFromLocationName(value, 1);
+
+               List<Address> l = geocoder.getFromLocationName(value,1);
                if (!l.isEmpty()) {
                    Address temp = l.get(0);
                    travelLocation = new Location("travelLocation");
@@ -197,7 +185,7 @@ public class Travel {
 
            }
            return  travelLocation;
-           }
+           }*/
 
     @TypeConverter
         public UserLocation fromString(String value) {
