@@ -128,6 +128,9 @@ public class AddTravelActivity extends AppCompatActivity {
      * @param view
      */
     public void addAddress(View view) {
+        try {
+
+
         if (fieldsArr.get(5).getText().toString().isEmpty())
             Toast.makeText(this, "enter a destination address", Toast.LENGTH_LONG).show();
         else {
@@ -136,6 +139,9 @@ public class AddTravelActivity extends AppCompatActivity {
             destAddressArr.add(destAddress);
 
             fieldsArr.get(5).setText("");
+        }
+    } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -146,6 +152,8 @@ public class AddTravelActivity extends AppCompatActivity {
      * @throws ParseException
      */
     public void saveTravelRequest(View view) throws ParseException {
+try {
+
 
        if (confirmInput(view)) {
            Date departingDate = new Travel.DateConverter().fromTimestamp(fieldsArr.get(6).getText().toString().trim());
@@ -161,17 +169,21 @@ public class AddTravelActivity extends AppCompatActivity {
            vipbus = ((CheckBox) findViewById(R.id.CBvipbus)).isChecked();
 
            travel = new Travel(fieldsArr.get(3).getText().toString().trim(), fieldsArr.get(1).getText().toString().trim()
-                   , fieldsArr.get(0).getText().toString().trim(), departingDate, returnDate, NumPassengers, pickupAddress, destAddressArr,vipbus);
+                   , fieldsArr.get(0).getText().toString().trim(), departingDate, returnDate, NumPassengers, pickupAddress, destAddressArr, vipbus);
            addTravel(travel);
-
        }
-    }
+       } catch (Exception e) {
+    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+}
+}
+
 
     /**
      * convert from the address string to location object
      * @param value
      */
-    public void LocationFromString(String value)  {
+    public void LocationFromString(String value) throws Exception {
+
 
            try {
                Geocoder geocoder =new Geocoder(getBaseContext());
@@ -183,12 +195,16 @@ public class AddTravelActivity extends AppCompatActivity {
             travelLocation.setLongitude(temp.getLongitude());
 
         } else {
-            Toast.makeText(this, "4:Unable to understand address", Toast.LENGTH_LONG).show();
+            Exception exp=new Exception("Unable to understand address");
+            throw (exp);
+         // "4:Unable to understand address", Toast.LENGTH_LONG).show();
+
         }
 
 
-    } catch (IOException e) {
-               e.printStackTrace();
+
+           } catch (Exception e) {
+              throw (e);
            }
 
     }
