@@ -67,6 +67,8 @@ public class AddTravelActivity extends AppCompatActivity {
             public void onChanged(Boolean flag) {
                 if (flag)
                     success();
+                else
+                   failed();
 
             }
         });
@@ -115,6 +117,10 @@ public class AddTravelActivity extends AppCompatActivity {
 
     public void success() {
         Toast.makeText(this, "Travel saved successfully  ", Toast.LENGTH_LONG).show();
+    }
+
+    public void failed() {
+        Toast.makeText(this, "Travel not saved successfully  ", Toast.LENGTH_LONG).show();
     }
 
     /**
