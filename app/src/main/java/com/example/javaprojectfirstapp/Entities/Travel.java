@@ -17,13 +17,15 @@ import java.util.Map;
 import android.app.Application;
 import android.location.Geocoder;
 import android.location.Location;
+import android.widget.Toast;
 
 
 @Entity
+
 public class Travel {
 
-    public  final Integer MAX_NUM_OF_ADDRESS = 5;
 
+  //  public  final Integer MAX_NUM_OF_ADDRESS = 5;
 
     @NonNull
     @PrimaryKey
@@ -32,10 +34,11 @@ public class Travel {
     private String clientPhone;
     private String clientEmail;
     private int    numOfPassenger;
+
     @TypeConverters(UserLocationConverter.class)
     private UserLocation pickupAddress;
 
-    private   List<UserLocation> destAddressList = new ArrayList<UserLocation>(MAX_NUM_OF_ADDRESS);
+    private   List<UserLocation> destAddressList ;
     @TypeConverters(RequestType.class)
     private RequestType requesType=RequestType.sent;
 
@@ -44,6 +47,10 @@ public class Travel {
 
     @TypeConverters(DateConverter.class)
     private Date arrivalDate;
+
+
+
+    private  boolean VIPBUS;
 
     private HashMap<String, Boolean> company;
 
@@ -58,11 +65,12 @@ public class Travel {
     public String getTravelDate() { return new DateConverter().dateToTimestamp(this.travelDate);}
     public String getArrivalDate() { return new DateConverter().dateToTimestamp(this.arrivalDate);}
     public String getCompany() { return new CompanyConverter().asString(this.company);}
-    public String getPickupAddress() { return this.pickupAddress.toString(); }
-    public String getDestAddressList() { return this.destAddressList.toString(); }
+    public UserLocation getPickupAddress() { return this.pickupAddress; }
+    public List<UserLocation> getDestAddressList() { return this.destAddressList; }
+    public boolean isVIPBUS() { return VIPBUS; }
 
     public Travel(String clientName, String clientPhone, String clientEmail, Date departingDate, Date returnDate
-            ,int numOfPassenger,UserLocation  pickupAddress , List<UserLocation> destAddress) {
+            ,int numOfPassenger,UserLocation  pickupAddress , List<UserLocation> destAddress,boolean VIPBUS) {
         this.clientName = clientName;
         this.clientPhone = clientPhone;
         this.clientEmail = clientEmail;
@@ -70,11 +78,9 @@ public class Travel {
         this.arrivalDate = returnDate;
         this.numOfPassenger=numOfPassenger;
         this.pickupAddress=pickupAddress;
-        this.destAddressList =destAddress;
-
+        this.destAddressList = new ArrayList<>(destAddress);
+       this.VIPBUS=VIPBUS;
     }
-
-
 
     public void setTravelId(String id) {
         this.travelId=id;
@@ -154,38 +160,7 @@ public class Travel {
     }
 
    public static class UserLocationConverter extends Application {
-       public Location travelLocation;
 
-
-            //  Location location=
-              Geocoder geocoder=new Geocoder(getBaseContext());
-
-           //Context context = ApplicationProvider.getApplicationContext();
-      //    Geocoder  geocoder = new Geocoder(context);
-
-     /*  @TypeConverter
-       public Location LocationFromString(String value)  {
-
-           try {
-
-               List<Address> l = geocoder.getFromLocationName(value,1);
-               if (!l.isEmpty()) {
-                   Address temp = l.get(0);
-                   travelLocation = new Location("travelLocation");
-                   travelLocation.setLatitude(temp.getLatitude());
-                   travelLocation.setLongitude(temp.getLongitude());
-                   return  travelLocation;
-               } else {
-                   Toast.makeText(this, "4:Unable to understand address", Toast.LENGTH_LONG).show();
-               }
-           }
-           catch (IOException e) {
-
-               Toast.makeText(this, "5:Unable to understand address. Check Internet connection.", Toast.LENGTH_LONG).show();
-
-           }
-           return  travelLocation;
-           }*/
 
     @TypeConverter
         public UserLocation fromString(String value) {

@@ -11,10 +11,10 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -26,7 +26,6 @@ import com.example.javaprojectfirstapp.R;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,21 +33,20 @@ import java.util.List;
 
 public class AddTravelActivity extends AppCompatActivity {
 
-    final Integer NUM_OF_FILDES = 8;
-    public  final Integer Max_NUM_OF_ADDRESS = 5;
+    private static final int NUM_OF_FILDES = 8 ;
     private Travel travel;
     private List<EditText> fieldsArr = new ArrayList<EditText>(NUM_OF_FILDES);
-    private List<UserLocation> destAddressArr = new ArrayList<UserLocation>(Max_NUM_OF_ADDRESS);
+    private List<UserLocation> destAddressArr = new ArrayList<UserLocation>();
     UserLocation userLocation =new UserLocation();
     DatePickerDialog picker;
-    EditText eText;
-    EditText eText2;
+    EditText TxtDepartingDate;
+    EditText TxtReturnDate;
     private AddTravelViewModel addTravelViewModel;
-    Button button;
-    Button button2;
+    Button BtnAddDestAddress;
+    Button BtnSaveTravelRequest;
     Location travelLocation;
     UserLocation destAddress;
-
+    boolean vipbus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +54,16 @@ public class AddTravelActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_travel);
 
-        button = (Button) findViewById(R.id.Btn_addDestAddress);
-        button.setBackgroundColor(Color.BLUE);
-        button2 = (Button) findViewById(R.id.Btn_saveTravelRequest);
-        button2.setBackgroundColor(Color.BLUE);
+        //set buttons color
+        BtnAddDestAddress = (Button) findViewById(R.id.Btn_addDestAddress);
+        BtnAddDestAddress.setBackgroundColor(Color.BLUE);
+        BtnSaveTravelRequest = (Button) findViewById(R.id.Btn_saveTravelRequest);
+        BtnSaveTravelRequest.setBackgroundColor(Color.BLUE);
 
 
         addTravelViewModel = new ViewModelProvider(this).get(AddTravelViewModel.class);
         addTravelViewModel.getTravelUpdate().observe(this, new Observer<Boolean>() {
-            @Override
+            @Override//check if travel been add to the firebase data
             public void onChanged(Boolean flag) {
                 if (flag)
                     success();
@@ -83,17 +82,17 @@ public class AddTravelActivity extends AppCompatActivity {
         fieldsArr.add(7, findViewById(R.id.Txt_returnDate));
 
 
-        //set date etext as type null so keyboard wont open
-        eText = (EditText) fieldsArr.get(6);
-        eText.setInputType(InputType.TYPE_NULL);
-        eText2 = (EditText) fieldsArr.get(7);
-        eText2.setInputType(InputType.TYPE_NULL);
-        String a = ((EditText)findViewById(R.id.Txt_pickupAddress)).getText().toString();
+
+        //set edit date text as type null so keyboard wont open
+        TxtDepartingDate = (EditText) fieldsArr.get(6);
+        TxtDepartingDate.setInputType(InputType.TYPE_NULL);
+        TxtReturnDate = (EditText) fieldsArr.get(7);
+        TxtReturnDate.setInputType(InputType.TYPE_NULL);
     }
 
     /**
-     * opens calender to pick the dates
-     * @param Etextview
+     * opens calender to pick the dates and insert the chosen date to the correct edit text
+     * @param Etextview the edit text that been prassed
      */
     public void chooseDate(View Etextview) {
 
@@ -105,9 +104,9 @@ public class AddTravelActivity extends AppCompatActivity {
                     new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-                            eText = (EditText)Etextview;
-                            eText.setText(year+"-"+monthOfYear+"-"+dayOfMonth);
+                               //choose the date edit text that been press to enter the date in it
+                            TxtDepartingDate = (EditText)Etextview;
+                            TxtDepartingDate.setText(year+"-"+monthOfYear+"-"+dayOfMonth);
                         }
                     }, year, month, day);
         picker.show();
@@ -118,39 +117,54 @@ public class AddTravelActivity extends AppCompatActivity {
         Toast.makeText(this, "Travel saved successfully  ", Toast.LENGTH_LONG).show();
     }
 
-    // LinearLayout ll = (LinearLayout) findViewById(R.id.linearLayout2);
+    /**
+     * add the pickupp destanation address from the edit text to the user location list and empty the edit text
+     * @param view
+     */
     public void addAddress(View view) {
+        if (fieldsArr.get(5).getText().toString().isEmpty())
+            Toast.makeText(this, "enter a destination address", Toast.LENGTH_LONG).show();
+        else {
+            LocationFromString(fieldsArr.get(5).getText().toString().trim());
+            destAddress = userLocation.convertFromLocation(travelLocation);
+            destAddressArr.add(destAddress);
 
-        LocationFromString(fieldsArr.get(5).getText().toString().trim());
-         destAddress =userLocation.convertFromLocation( travelLocation);
-        destAddressArr.add(destAddress);
-        //Toast.makeText(this, fieldsArr.get(5).getText().toString().trim(), Toast.LENGTH_LONG).show();
-        fieldsArr.get(5).setText("");
-
+            fieldsArr.get(5).setText("");
+        }
     }
 
-
+    /**
+     * get all the travel details from the grafic object,convert where needed according to travel contractor
+      or add to exist list, make new travel with the details
+     * @param view
+     * @throws ParseException
+     */
     public void saveTravelRequest(View view) throws ParseException {
 
-    //   if (confirmInput(view)) {
-            Date departingDate=new Travel.DateConverter().fromTimestamp(fieldsArr.get(6).getText().toString().trim());
-            Date returnDate=new Travel.DateConverter().fromTimestamp(fieldsArr.get(7).getText().toString().trim());
-            int NumPassengers=Integer.parseInt(fieldsArr.get(2).getText().toString().trim());
+       if (confirmInput(view)) {
+           Date departingDate = new Travel.DateConverter().fromTimestamp(fieldsArr.get(6).getText().toString().trim());
+           Date returnDate = new Travel.DateConverter().fromTimestamp(fieldsArr.get(7).getText().toString().trim());
+           int NumPassengers = Integer.parseInt(fieldsArr.get(2).getText().toString().trim());
 
-        LocationFromString(fieldsArr.get(4).getText().toString().trim());
-            UserLocation pickupAddress =userLocation.convertFromLocation( travelLocation);
+           LocationFromString(fieldsArr.get(4).getText().toString().trim());
+           UserLocation pickupAddress = userLocation.convertFromLocation(travelLocation);
 
-        LocationFromString(fieldsArr.get(5).getText().toString().trim());
-         destAddress =userLocation.convertFromLocation( travelLocation);
+           LocationFromString(fieldsArr.get(5).getText().toString().trim());
+           destAddress = userLocation.convertFromLocation(travelLocation);
+           destAddressArr.add(destAddress);
+           vipbus = ((CheckBox) findViewById(R.id.CBvipbus)).isChecked();
 
-            travel = new Travel(fieldsArr.get(3).getText().toString().trim(), fieldsArr.get(1).getText().toString().trim()
-                    , fieldsArr.get(0).getText().toString().trim(),departingDate,returnDate, NumPassengers,pickupAddress,destAddressArr);
-        Toast.makeText(this, pickupAddress.toString(), Toast.LENGTH_LONG).show();
-            addTravel(travel);
-            Toast.makeText(this, "detail sent down", Toast.LENGTH_LONG).show();
-   //     }
+           travel = new Travel(fieldsArr.get(3).getText().toString().trim(), fieldsArr.get(1).getText().toString().trim()
+                   , fieldsArr.get(0).getText().toString().trim(), departingDate, returnDate, NumPassengers, pickupAddress, destAddressArr,vipbus);
+           addTravel(travel);
+
+       }
     }
 
+    /**
+     * convert from the address string to location object
+     * @param value
+     */
     public void LocationFromString(String value)  {
 
            try {
@@ -178,6 +192,11 @@ public class AddTravelActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * confirm validation of all tha details from the user
+     * @param v
+     * @return if all details valid
+     */
     public boolean confirmInput(View v) {
         boolean flag = true;
         for (EditText field : fieldsArr) {
@@ -193,16 +212,13 @@ public class AddTravelActivity extends AppCompatActivity {
         if (Input.isEmpty()) {
             InputId.setError("Field can't be empty");
             return false;
-        } else
+        } else//check if the field need a specific validation
             switch (fieldsArr.indexOf(InputId)) {
                 case 0:
                     return validateEmail();
 
                 case 1:
                     return validatePhone();
-
-                case 2:
-                    return validateNumOfPassenger();
 
                 case 3:
                     return validateName();
@@ -244,17 +260,6 @@ public class AddTravelActivity extends AppCompatActivity {
             return false;
         } else {
             fieldsArr.get(3).setError(null);
-            return true;
-        }
-    }
-
-    private boolean validateNumOfPassenger() {
-        String numOfPassngerInput = fieldsArr.get(2).getText().toString().trim();
-        if (!TextUtils.isDigitsOnly(numOfPassngerInput)) {
-            fieldsArr.get(2).setError("Please enter a valid number");
-            return false;
-        } else {
-            fieldsArr.get(2).setError(null);
             return true;
         }
     }

@@ -15,8 +15,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity  {
-   // FirebaseDatabase database = FirebaseDatabase.getInstance();
-   // DatabaseReference myRef = database.getReference("message");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +27,6 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     public void go_to_add_travel_func(View view) {
-        Toast.makeText(this,"clicked ",Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, AddTravelActivity.class);
         startActivity(intent);
     }
