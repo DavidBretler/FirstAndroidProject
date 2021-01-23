@@ -13,7 +13,8 @@ import com.example.javaprojectfirstapp.R;
 import com.example.javaprojectfirstapp.UI.AddTravel.AddTravelActivity;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
+//david bterler 206301384
+//dov baker 203301072
 public class MainActivity extends AppCompatActivity  {
 
     @Override

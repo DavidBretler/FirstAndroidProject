@@ -1,5 +1,6 @@
 package com.example.javaprojectfirstapp.Entities;
 
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -15,62 +16,105 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Application;
-import android.location.Geocoder;
-import android.location.Location;
-import android.widget.Toast;
+
+import com.example.javaprojectfirstapp.Entities.UserLocation;
 
 
-@Entity
+@Entity (tableName = "travels")
+
 
 public class Travel {
 
-
-  //  public  final Integer MAX_NUM_OF_ADDRESS = 5;
-
+    /////////////FIELDS
     @NonNull
     @PrimaryKey
     private String travelId = "id";
     private String clientName;
     private String clientPhone;
     private String clientEmail;
-    private int    numOfPassenger;
-
+    private int   numOfPassenger;
     @TypeConverters(UserLocationConverter.class)
     private UserLocation pickupAddress;
 
-    private   List<UserLocation> destAddressList ;
-    @TypeConverters(RequestType.class)
-    private RequestType requesType=RequestType.sent;
 
+    @TypeConverters(UserLocationConverter.class)
+    private UserLocation detentionAddress;
+
+    public UserLocation getDetentionAddress() {
+        return detentionAddress;
+    }
+
+    public void setDetentionAddress(UserLocation detentionAddress) {
+        this.detentionAddress = detentionAddress;
+    }
+
+    @TypeConverters(RequestType.class)
+    private RequestType requestType=RequestType.sent;
     @TypeConverters(DateConverter.class)
     private Date travelDate;
-
     @TypeConverters(DateConverter.class)
     private Date arrivalDate;
-
-
-
     private  boolean VIPBUS;
-
+    @TypeConverters(CompanyConverter.class)
     private HashMap<String, Boolean> company;
 
-    public String getId(){
-        return this.travelId;
-    }
+    /////////////GETTERS
+    @NonNull
+    public String getTravelId(){  return travelId; }
+
     public String getClientName() {return this.clientName; }
+
+
     public String getClientPhone() {return this.clientPhone; }
+
     public String getClientEmail() {return this.clientEmail; }
-    public Integer getNumPassengers() { return this.numOfPassenger; }
-    public Integer getRequestType() { return RequestType.getTypeInt(this.requesType);}
-    public String getTravelDate() { return new DateConverter().dateToTimestamp(this.travelDate);}
-    public String getArrivalDate() { return new DateConverter().dateToTimestamp(this.arrivalDate);}
-    public String getCompany() { return new CompanyConverter().asString(this.company);}
+
+
+    public int getNumOfPassenger() {    return numOfPassenger; }
+
+    public RequestType getRequestType() { return requestType; }
+
+    public Date getTravelDate() { return this.travelDate;}
+
+
+    public Date getArrivalDate() { return this.arrivalDate;}
+
+    public HashMap<String, Boolean> getCompany() { return this.company;}
+
     public UserLocation getPickupAddress() { return this.pickupAddress; }
-    public List<UserLocation> getDestAddressList() { return this.destAddressList; }
-    public boolean isVIPBUS() { return VIPBUS; }
+
+    //   public UserLocation getDetentionAddress() { return detentionAddress; }
+
+    public boolean isVIPBUS() { return this.VIPBUS; }
+
+    //////////////////SETTERS
+    public void setTravelId( @NonNull String id) { this.travelId=id; }
+
+    public void setClientName(String clientName) { this.clientName = clientName; }
+
+
+    public void setClientPhone(String clientPhone) { this.clientPhone = clientPhone; }
+
+    public void setClientEmail(String clientEmail) { this.clientEmail = clientEmail; }
+
+    public void setNumOfPassenger(int numOfPassenger) { this.numOfPassenger = numOfPassenger; }
+
+    public void setPickupAddress(UserLocation pickupAddress) { this.pickupAddress = pickupAddress; }
+
+    //  public void setDetentionAddress(UserLocation detentionAddress) { this.detentionAddress = detentionAddress; }
+
+    public void setRequestType(RequestType requesType) { this.requestType = requesType; }
+
+    public void setTravelDate(Date travelDate) { this.travelDate = travelDate; }
+
+    public void setArrivalDate(Date arrivalDate) { this.arrivalDate = arrivalDate; }
+
+    public void setVIPBUS(boolean VIPBUS) { this.VIPBUS = VIPBUS; }
+
+    public void setCompany(HashMap<String, Boolean> company) { this.company = company; }
 
     public Travel(String clientName, String clientPhone, String clientEmail, Date departingDate, Date returnDate
-            ,int numOfPassenger,UserLocation  pickupAddress , List<UserLocation> destAddress,boolean VIPBUS) {
+            ,int numOfPassenger,UserLocation  pickupAddress , UserLocation destAddress,RequestType requestType,boolean VIPBUS, HashMap<String, Boolean> company) {
         this.clientName = clientName;
         this.clientPhone = clientPhone;
         this.clientEmail = clientEmail;
@@ -78,13 +122,15 @@ public class Travel {
         this.arrivalDate = returnDate;
         this.numOfPassenger=numOfPassenger;
         this.pickupAddress=pickupAddress;
-        this.destAddressList = new ArrayList<>(destAddress);
-       this.VIPBUS=VIPBUS;
+         this.detentionAddress = destAddress;
+        this.requestType=requestType;
+        this.VIPBUS=VIPBUS;
+        this.company = company;
     }
 
-    public void setTravelId(String id) {
-        this.travelId=id;
-    }
+    public  Travel(){}
+
+
 
 
     public static class DateConverter {
@@ -102,9 +148,8 @@ public class Travel {
     }
 
 
-
     public enum RequestType {
-        sent(0), accepted(1), run(2), close(3);
+        sent(0), accepted(1), run(2), close(3),payed(4);
         private final Integer code;
         RequestType(Integer value) {
             this.code = value;
@@ -126,9 +171,6 @@ public class Travel {
             return null;
         }
     }
-
-
-
 
     public static class CompanyConverter {
         @TypeConverter
@@ -158,11 +200,45 @@ public class Travel {
             return mapString.toString();
         }
     }
+    //
+    public static class ListuserlocConverter {
+        //        UserLocationConverter userLocationConverter;
+        @TypeConverter
+        public String ListToString(List<UserLocation> list) {
+//            userLocationConverter =new  Travel.UserLocationConverter();
+//            if (list == null )
+//                return null;
+//            StringBuilder listString = new StringBuilder();
+//
+//            for (UserLocation loc : list) {
+//                listString.append(userLocationConverter.asString(loc)).append(",");
+//            }
+//            return listString.toString() ;
+            return "kuku";
+        }
 
-   public static class UserLocationConverter extends Application {
+        @TypeConverter
+        public List<UserLocation> StringToList(String value) {
+//            if (value == null || value.isEmpty())
+//                return null;
+//            String[] listString = value.split(","); //split list into array of strings
+            List<UserLocation> list = new ArrayList<UserLocation>();
+            list.add(new UserLocation(10,20));
 
+//            for (String s1 : listString) //for all (string,boolean) in the map string
+//                if (!s1.isEmpty()) //is empty maybe will needed because the last char in the string is ","
+//                {
+//
+//                    list.add(userLocationConverter.fromString(s1)); //user location
+//                }
+            return list;
+        }
 
-    @TypeConverter
+    }
+
+    public static class UserLocationConverter extends Application {
+
+        @TypeConverter
         public UserLocation fromString(String value) {
             if (value == null || value.equals(""))
                 return null;
@@ -175,6 +251,8 @@ public class Travel {
         public String asString(UserLocation warehouseUserLocation) {
             return warehouseUserLocation == null ? "" : warehouseUserLocation.getLat() + " " + warehouseUserLocation.getLon();
         }
+
+
     }
 
 }

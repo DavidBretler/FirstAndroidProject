@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class AddTravelActivity extends AppCompatActivity {
@@ -47,7 +48,6 @@ public class AddTravelActivity extends AppCompatActivity {
     Location travelLocation;
     UserLocation destAddress;
     boolean vipbus;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -168,9 +168,14 @@ try {
            destAddressArr.add(destAddress);
            vipbus = ((CheckBox) findViewById(R.id.CBvipbus)).isChecked();
 
+           HashMap<String, Boolean> company;
+           company=new HashMap<String, Boolean>();
+           company.put("Eged",false);
            travel = new Travel(fieldsArr.get(3).getText().toString().trim(), fieldsArr.get(1).getText().toString().trim()
-                   , fieldsArr.get(0).getText().toString().trim(), departingDate, returnDate, NumPassengers, pickupAddress, destAddressArr, vipbus);
+                   , fieldsArr.get(0).getText().toString().trim(), departingDate, returnDate, NumPassengers, pickupAddress,
+                   destAddressArr.get(0), Travel.RequestType.accepted, vipbus,company);
            addTravel(travel);
+           destAddressArr.clear();
        }
        } catch (Exception e) {
     Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -228,7 +233,6 @@ try {
 
         return flag;
     }
-
     private boolean validation(EditText InputId) {
         String Input = InputId.getText().toString().trim();
         if (Input.isEmpty()) {
@@ -263,7 +267,6 @@ try {
             return true;
         }
     }
-
     private boolean validatePhone() {
         String phoneInput = fieldsArr.get(1).getText().toString().trim();
         if (!Patterns.PHONE.matcher(phoneInput).matches()) {
@@ -274,7 +277,6 @@ try {
             return true;
         }
     }
-
     private boolean validateName() {
         String nameInput = fieldsArr.get(3).getText().toString().trim();
         if (nameInput.matches(".*\\d.*")) {
